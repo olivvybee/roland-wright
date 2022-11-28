@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "es2017",
+    "noImplicitAny": false
+  },
+  "ts-node": {
+    "esm": true
+  }
+}
