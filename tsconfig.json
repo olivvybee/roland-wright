@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "strict": true,
     "target": "es2017",
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["vitest/globals"]
   },
   "ts-node": {
     "esm": true
