@@ -1,4 +1,6 @@
-import { DiceColour } from './games/sagrada/Dice.js';
-import { play } from './games/sagrada/Sagrada.js';
+import fs from 'fs';
+import { Sagrada } from './games/sagrada';
 
-play();
+const { imageBuffer, altText } = Sagrada.play();
+
+fs.writeFileSync('/Users/olivia/Desktop/test.png', imageBuffer);

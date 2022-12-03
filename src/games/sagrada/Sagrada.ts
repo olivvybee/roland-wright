@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { createCanvas } from 'canvas';
 
 import { selectRandom } from '../../utils/random.js';
@@ -8,14 +7,23 @@ import { Board } from './Board.js';
 import { PATTERNS } from './patterns.js';
 import { isColourRestriction, isValueRestriction } from './Restriction.js';
 import { DiceColour } from './Dice.js';
+import { Game } from '../../types/Game.js';
 
-export const play = () => {
-  const pattern = selectRandom(PATTERNS);
-  const board = new Board(pattern);
-  const bot = new Bot(board);
+export const Sagrada: Game = {
+  play: () => {
+    const pattern = selectRandom(PATTERNS);
+    const board = new Board(pattern);
+    const bot = new Bot(board);
 
-  const result = bot.play();
-  renderResult(result);
+    const result = bot.play();
+    const imageBuffer = renderResult(result);
+
+    return {
+      imageBuffer,
+      altText:
+        "An illustration of completed Sagrada board. It's a grid with 4 rows and 5 columns, filled with randomly chosen dice coloured red, green, blue, yellow, and purple.",
+    };
+  },
 };
 
 const WIDTH = 1600;
@@ -89,8 +97,7 @@ const renderResult = (board: Board) => {
     }
   }
 
-  const imageBuffer = canvas.toBuffer();
-  fs.writeFileSync('/Users/olivia/Desktop/test.png', imageBuffer);
+  return canvas.toBuffer();
 };
 
 const getCoordinates = (row: number, column: number) => {
