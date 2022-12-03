@@ -1,75 +1,55 @@
-import chalk from 'chalk';
-import { randomEnum } from '../../utils/random.js';
-
-export enum DiceColour {
-  Red = 'R',
-  Yellow = 'Y',
-  Blue = 'B',
-  Green = 'G',
-  Purple = 'P',
-}
-
-export const colourise =
-  (diceColour: DiceColour) =>
-  (...data: any[]) => {
-    switch (diceColour) {
-      case DiceColour.Red:
-        return chalk.red(data);
-      case DiceColour.Yellow:
-        return chalk.yellow(data);
-      case DiceColour.Blue:
-        return chalk.blue(data);
-      case DiceColour.Green:
-        return chalk.green(data);
-      case DiceColour.Purple:
-        return chalk.magenta(data);
-      default:
-        return data;
-    }
-  };
-
-export interface Dice {
-  value: number;
-  colour: DiceColour;
-}
-
-export const diceToString = (dice: Dice) => colourise(dice.colour)(dice.value);
+import _shuffle from 'lodash/shuffle.js';
+import { popRandom } from '../../utils/random.js';
+import { Dice, DiceColour } from './Dice.js';
 
 export class DiceBag {
-  private remainingDice: { [key in DiceColour]: number };
+  contents: Dice[];
 
   constructor() {
-    this.remainingDice = {
-      [DiceColour.Red]: 18,
-      [DiceColour.Yellow]: 18,
-      [DiceColour.Blue]: 18,
-      [DiceColour.Green]: 18,
-      [DiceColour.Purple]: 18,
-    };
+    const dice: Dice[] = [];
+    [
+      DiceColour.Red,
+      DiceColour.Yellow,
+      DiceColour.Blue,
+      DiceColour.Green,
+      DiceColour.Purple,
+    ].forEach((colour) => {
+      for (let i = 0; i < 18; i++) {
+        dice.push(new Dice(colour));
+      }
+    });
+    this.contents = _shuffle(dice);
   }
 
-  public roll() {
-    const results: Dice[] = [];
-
-    for (let i = 0; i < 5; i++) {
-      let colour: DiceColour;
-      do {
-        colour = randomEnum(DiceColour);
-      } while (this.remainingDice[colour] === 0);
-      this.remainingDice[colour] -= 1;
-
-      const value = Math.ceil(Math.random() * 6);
-
-      results.push({
-        value,
-        colour,
-      });
+  draw = (count: number) => {
+    const drawnDice: Dice[] = [];
+    for (let i = 0; i < count; i++) {
+      drawnDice.push(popRandom(this.contents));
     }
+    return drawnDice;
+  };
 
-    return results;
-  }
+  toString = () => {
+    const colourCounts = [
+      DiceColour.Red,
+      DiceColour.Yellow,
+      DiceColour.Blue,
+      DiceColour.Green,
+      DiceColour.Purple,
+    ].reduce((counts, colour) => {
+      const count = this.contents.filter(
+        (dice) => dice.colour === colour
+      ).length;
+      return {
+        ...counts,
+        [DiceColour[colour].charAt(0)]: count,
+      };
+    }, {});
 
-  public getContents() {
-    return this.remainingDice;
-  }
+    const countList = Object.entries(colourCounts)
+      .map(([colour, count]) => `${colour}: ${count}`)
+      .join(', ');
+
+    return `${this.contents.length} dice (${countList})`;
+  };
 }

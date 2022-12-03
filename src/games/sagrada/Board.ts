@@ -1,241 +1,153 @@
-import { colourise, Dice, DiceColour } from './DiceBag.js';
-
-export interface Position {
-  row: number;
-  column: number;
-}
-
-export type Restriction = DiceColour | number | undefined;
-
-const isValueRestriction = (restriction: Restriction) =>
-  typeof restriction === 'number';
-const isColourRestriction = (restriction: Restriction) =>
-  typeof restriction === 'string';
+import { Dice } from './Dice.js';
+import { Pattern } from './Pattern.js';
+import { restrictionToString } from './Restriction.js';
 
 type GridSpace = Dice | undefined;
-type Pattern = Restriction[][];
 
 export class Board {
-  private restrictions: Pattern;
-  private grid: GridSpace[][];
-  private hasPlacedDice: boolean;
+  pattern: Pattern;
+  grid: GridSpace[][];
+  rowCount: number;
+  columnCount: number;
+  hasPlacedDice: boolean;
 
-  constructor(restrictions: Restriction[][]) {
-    this.restrictions = restrictions;
+  constructor(pattern: string) {
+    this.pattern = new Pattern(pattern);
+    this.rowCount = this.pattern.restrictions.length;
+    this.columnCount = this.pattern.restrictions[0].length;
     this.hasPlacedDice = false;
 
-    const rows = restrictions.length;
-    const cols = restrictions[0].length;
-
     this.grid = [];
-    for (let i = 0; i < rows; i++) {
+    for (let r = 0; r < this.rowCount; r++) {
       const row: GridSpace[] = [];
-      for (let c = 0; c < cols; c++) {
+      for (let c = 0; c < this.columnCount; c++) {
         row.push(undefined);
       }
       this.grid.push(row);
     }
   }
 
-  private get rows() {
-    return this.grid.length;
-  }
-
-  private get columns() {
-    return this.grid[0].length;
-  }
-
-  private isAtEdge(row: number, column: number) {
-    if (
-      row === 0 ||
-      row === this.rows - 1 ||
-      column === 0 ||
-      column === this.columns - 1
-    ) {
-      return true;
-    }
-  }
-
-  private isAdjacentToPlacedDice(row: number, column: number) {
-    for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
-        const r = row + i;
-        const c = column + j;
-
-        if (
-          r >= 0 &&
-          r < this.rows &&
-          c >= 0 &&
-          c < this.columns &&
-          this.grid[r][c] !== undefined
-        ) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  private isAdjacentToMatchingDice(dice: Dice, row: number, column: number) {
-    const offsets = [
-      [-1, 0],
-      [1, 0],
-      [0, -1],
-      [0, 1],
-    ];
-
-    for (const offset of offsets) {
-      const r = row + offset[0];
-      const c = column + offset[1];
-
-      if (r >= 0 && r < this.rows && c >= 0 && c < this.columns) {
-        const existingDice = this.grid[r][c];
-        if (existingDice !== undefined) {
-          if (
-            existingDice.colour === dice.colour ||
-            existingDice.value === dice.value
-          ) {
-            return true;
-          }
-        }
-      }
-    }
-
-    return false;
-  }
-
-  public validPositions(dice: Dice) {
-    const positions: number[][] = [];
-    for (let r = 0; r < this.rows; r++) {
-      for (let c = 0; c < this.columns; c++) {
-        if (this.grid[r][c] !== undefined) {
-          continue;
-        }
-
-        if (this.isAdjacentToMatchingDice(dice, r, c)) {
-          continue;
-        }
-
-        const restriction = this.restrictions[r][c];
-        if (isColourRestriction(restriction) && dice.colour !== restriction) {
-          continue;
-        }
-        if (isValueRestriction(restriction) && dice.value !== restriction) {
-          continue;
-        }
-
-        if (!this.hasPlacedDice && !this.isAtEdge(r, c)) {
-          continue;
-        }
-
-        if (this.hasPlacedDice && !this.isAdjacentToPlacedDice(r, c)) {
-          continue;
-        }
-
-        positions.push([r, c]);
-      }
-    }
-
-    return positions;
-  }
-
-  public spaceHasRestriction(row: number, column: number) {
-    return this.restrictions[row][column] !== undefined;
-  }
-
-  public blocksAdjacentRestriction(dice: Dice, row: number, column: number) {
-    const offsets = [
-      [-1, 0],
-      [1, 0],
-      [0, -1],
-      [0, 1],
-    ];
-
-    for (const offset of offsets) {
-      const r = row + offset[0];
-      const c = column + offset[1];
-
-      if (r >= 0 && r < this.rows && c >= 0 && c < this.columns) {
-        const restriction = this.restrictions[r][c];
-        if (isValueRestriction(restriction) && restriction === dice.value) {
-          return true;
-        }
-        if (isColourRestriction(restriction) && restriction === dice.colour) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  public optimalPositions(dice: Dice) {
-    const validPositions = this.validPositions(dice);
-
-    const positionsFulfillingRestrictions = validPositions.filter(([r, c]) =>
-      this.spaceHasRestriction(r, c)
-    );
-    const positionsNotBlockingRestrictions = validPositions.filter(
-      ([r, c]) => !this.blocksAdjacentRestriction(dice, r, c)
-    );
-
-    return validPositions.filter(
-      (position) =>
-        positionsFulfillingRestrictions.includes(position) &&
-        positionsNotBlockingRestrictions.includes(position)
-    );
-  }
-
-  public blockingPositions(dice: Dice) {
-    const validPositions = this.validPositions(dice);
-
-    return validPositions.filter(([r, c]) =>
-      this.blocksAdjacentRestriction(dice, r, c)
-    );
-  }
-
-  public placeDice(dice: Dice, row: number, column: number) {
+  placeDice = (dice: Dice, row: number, column: number) => {
     this.grid[row][column] = dice;
     this.hasPlacedDice = true;
-  }
+  };
 
-  public print() {
-    for (let r = 0; r < this.rows; r++) {
-      let row = '';
-      for (let c = 0; c < this.columns; c++) {
-        const space = this.grid[r][c];
-        if (space === undefined) {
-          row += '-';
-        } else {
-          const { value, colour } = space;
-          row += colourise(colour)(value);
-        }
-        row += ' ';
-      }
-      console.log(row);
-    }
-    console.log();
-  }
+  getDice = (row: number, column: number) => {
+    return this.grid[row][column];
+  };
 
-  public printRestrictions() {
-    for (let r = 0; r < this.restrictions.length; r++) {
-      let row = '';
-      for (let c = 0; c < this.restrictions[r].length; c++) {
-        const restriction = this.restrictions[r][c];
-        if (restriction === undefined) {
-          row += '-';
-        } else {
-          if (isColourRestriction(restriction)) {
-            row += colourise(restriction as DiceColour)(restriction);
-          } else {
-            row += restriction;
-          }
-        }
-        row += ' ';
+  getOrthogonalNeighbours = (row: number, column: number) => {
+    const offsets = [
+      { r: -1, c: 0 },
+      { r: 1, c: 0 },
+      { r: 0, c: -1 },
+      { r: 0, c: 1 },
+    ];
+
+    return offsets.map(({ r, c }) => {
+      const newRow = row + r;
+      const newColumn = column + c;
+      if (
+        newRow >= 0 &&
+        newRow < this.rowCount &&
+        newColumn >= 0 &&
+        newColumn < this.columnCount
+      ) {
+        return this.getDice(newRow, newColumn);
+      } else {
+        return undefined;
       }
-      console.log(row);
+    });
+  };
+
+  getAllNeighbours = (row: number, column: number) => {
+    const neighbours: GridSpace[] = [];
+    for (let r = -1; r <= 1; r++) {
+      for (let c = -1; c <= 1; c++) {
+        const newRow = row + r;
+        const newColumn = column + c;
+        if (
+          newRow >= 0 &&
+          newRow < this.rowCount &&
+          newColumn >= 0 &&
+          newColumn < this.columnCount
+        ) {
+          neighbours.push(this.getDice(newRow, newColumn));
+        } else {
+          neighbours.push(undefined);
+        }
+      }
     }
-    console.log();
-  }
+    return neighbours;
+  };
+
+  getRestriction = (row: number, column: number) => {
+    return this.pattern.get(row, column);
+  };
+
+  getAdjacentUnfulfilledRestrictions = (row: number, column: number) => {
+    const offsets = [
+      { r: -1, c: 0 },
+      { r: 1, c: 0 },
+      { r: 0, c: -1 },
+      { r: 0, c: 1 },
+    ];
+
+    return offsets
+      .map(({ r, c }) => {
+        const newRow = row + r;
+        const newColumn = column + c;
+        if (
+          newRow >= 0 &&
+          newRow < this.rowCount &&
+          newColumn >= 0 &&
+          newColumn < this.columnCount
+        ) {
+          const dice = this.getDice(newRow, newColumn);
+          const restriction = this.getRestriction(newRow, newColumn);
+          return !!dice ? undefined : restriction;
+        } else {
+          return undefined;
+        }
+      })
+      .filter(Boolean);
+  };
+
+  toString = () => {
+    let str = '';
+    for (let row = 0; row < this.rowCount; row++) {
+      let rowStr = '';
+      for (let column = 0; column < this.columnCount; column++) {
+        const dice = this.getDice(row, column);
+        if (dice) {
+          rowStr += dice.toString();
+        } else {
+          rowStr += '--';
+        }
+        rowStr += ' ';
+      }
+      str += rowStr;
+      str += '\n';
+    }
+    return str;
+  };
+
+  restrictionsAsString = () => {
+    let str = '';
+    for (let row = 0; row < this.rowCount; row++) {
+      let rowStr = '';
+      for (let column = 0; column < this.columnCount; column++) {
+        const restriction = this.getRestriction(row, column);
+        if (restriction) {
+          rowStr += restrictionToString(restriction);
+        } else {
+          rowStr += '-';
+        }
+        rowStr += ' ';
+      }
+      str += rowStr;
+      str += '\n';
+    }
+    return str;
+  };
 }
