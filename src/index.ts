@@ -1,6 +1,21 @@
-import fs from 'fs';
-import { Sagrada } from './games/sagrada';
+import inquirer from 'inquirer';
+import { config as loadEnv } from 'dotenv';
 
-const { imageBuffer, altText } = Sagrada.play();
+import { GAMES } from './games';
+import handler from './handler.js';
 
-fs.writeFileSync('/Users/olivia/Desktop/test.png', imageBuffer);
+const run = async () => {
+  const { gameName } = await inquirer.prompt([
+    {
+      name: 'gameName',
+      type: 'list',
+      message: 'Choose a game:',
+      choices: Object.keys(GAMES),
+    },
+  ]);
+
+  handler({ gameName });
+};
+
+loadEnv();
+run();

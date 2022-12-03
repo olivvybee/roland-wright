@@ -29,21 +29,24 @@ export const Sagrada: Game = {
 const WIDTH = 1600;
 const HEIGHT = 900;
 
-const DIVIDER_SIZE = HEIGHT / 18;
-const DICE_SIZE = (HEIGHT - 5 * DIVIDER_SIZE) / 4;
+const PADDING_V = 25;
 
-const PADDING_V = 50;
+const BOARD_HEIGHT = HEIGHT - 2 * PADDING_V;
+
+const DIVIDER_SIZE = BOARD_HEIGHT / 18;
+const DICE_SIZE = (BOARD_HEIGHT - 5 * DIVIDER_SIZE) / 4;
+
 const PADDING_H = (WIDTH - 6 * DIVIDER_SIZE - 5 * DICE_SIZE) / 2;
 
 const PIP_SIZE = 20;
 const PIP_PADDING = 5;
 
 const renderResult = (board: Board) => {
-  const canvas = createCanvas(WIDTH, HEIGHT + 2 * PADDING_V);
+  const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext('2d');
 
   ctx.fillStyle = 'rgb(200,200,190)';
-  ctx.fillRect(0, 0, WIDTH, HEIGHT + 2 * PADDING_V);
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   ctx.strokeStyle = 'pink';
   ctx.strokeRect(
@@ -59,7 +62,7 @@ const renderResult = (board: Board) => {
       x * (DICE_SIZE + DIVIDER_SIZE) + PADDING_H,
       PADDING_V,
       DIVIDER_SIZE,
-      HEIGHT
+      BOARD_HEIGHT
     );
   }
   for (let y = 0; y < 5; y++) {
