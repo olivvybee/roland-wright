@@ -20,6 +20,11 @@ const main = async (gameName?: string) => {
     : schedule[hour];
 
   if (!game) {
+    if (gameName) {
+      console.log(`Unrecognised game name "${gameName}"`);
+    } else {
+      console.log(`No game scheduled for ${hour}:00.`);
+    }
     return;
   }
 
