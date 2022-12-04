@@ -1,5 +1,3 @@
 import { Sagrada } from './sagrada';
 
-export const GAMES = {
-  Sagrada,
-};
+export const GAMES = [Sagrada];

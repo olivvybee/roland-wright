@@ -4,5 +4,6 @@ export interface GameResult {
 }
 
 export interface Game {
+  name: string;
   play: () => GameResult;
 }
