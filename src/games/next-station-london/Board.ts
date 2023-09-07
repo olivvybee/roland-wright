@@ -1,6 +1,7 @@
 import { createCanvas } from 'canvas';
 
 import { Node } from './Node';
+import { Edge } from './Edge';
 import {
   DISTRICT_LINES,
   NODES,
@@ -20,7 +21,7 @@ import {
 
 export class Board {
   nodes: Node[];
-  edges: Node[][];
+  edges: Edge[];
 
   constructor() {
     this.nodes = [];
@@ -57,8 +58,8 @@ export class Board {
     return this.nodes.find((node) => node.x === x && node.y === y);
   };
 
-  getStartNode = (colour: Colour) => {
-    return this.nodes.find((node) => node.startingSpaceColour === colour);
+  getStartNode = (colour: Colour): Node => {
+    return this.nodes.find((node) => node.startingSpaceColour === colour)!;
   };
 
   getConnectedNodes = (node: Node) => {
@@ -94,6 +95,14 @@ export class Board {
     return this.getConnectedNodes(node).filter(
       (otherNode) => otherNode.shape === shape
     );
+  };
+
+  addEdge = (edge: Edge) => {
+    this.edges.push(edge);
+  };
+
+  edgeWouldIntersectExistingEdge = (edge: Edge) => {
+    return this.edges.some((otherEdge) => edge.intersects(otherEdge));
   };
 
   draw = () => {
@@ -153,6 +162,10 @@ export class Board {
     });
 
     ctx.setLineDash([]);
+
+    this.edges.forEach((edge) => {
+      edge.draw(ctx);
+    });
 
     this.nodes.forEach((node) => {
       node.draw(ctx);
