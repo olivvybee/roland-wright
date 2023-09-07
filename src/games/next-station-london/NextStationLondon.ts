@@ -8,7 +8,7 @@ export const NextStationLondon: Game = {
     const board = new Board();
 
     const stringRepresentation = board.toString();
-    const imageBuffer = renderResult(board);
+    const imageBuffer = board.draw();
 
     return {
       imageBuffer,
@@ -16,8 +16,4 @@ export const NextStationLondon: Game = {
       stringRepresentation,
     };
   },
-};
-
-const renderResult = (board: Board) => {
-  return createCanvas(100, 100).toBuffer();
 };
