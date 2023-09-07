@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { Canvas, createCanvas } from 'canvas';
 
-import { NODES, START_NODES, TOURIST_SPOTS } from './boardSetup';
+import { NODES, RIVER, START_NODES, TOURIST_SPOTS } from './boardSetup';
 import { Colour, Shape } from './types';
 
 const BOARD_SIZE = 10;
@@ -20,7 +20,7 @@ const getHexColour = (colour: Colour | undefined) => {
     case Colour.Purple:
       return '#6f389c';
     case Colour.Blue:
-      return '#006bc9';
+      return '#014e91';
     default:
       return '#211759';
   }
@@ -46,6 +46,13 @@ const colourise = (colour: Colour | undefined) => {
 const getCentre = (node: Node) => {
   const x = (node.x + 0.5) * GRID_SIZE;
   const y = (node.y + 0.5) * GRID_SIZE;
+
+  return { x, y };
+};
+
+const getRiverPosition = ({ x: gridX, y: gridY }: { x: number; y: number }) => {
+  const x = (gridX + 0.5) * GRID_SIZE;
+  const y = (gridY + 1) * GRID_SIZE;
 
   return { x, y };
 };
@@ -262,10 +269,25 @@ export class Board {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
+    ctx.strokeStyle = '#2b8dbe';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = GRID_SIZE / 3;
+    ctx.beginPath();
+
+    const { x: startX, y: startY } = getRiverPosition(RIVER[0]);
+    ctx.moveTo(startX, startY);
+    RIVER.forEach((position) => {
+      const { x: nextX, y: nextY } = getRiverPosition(position);
+      ctx.lineTo(nextX, nextY);
+    });
+    ctx.stroke();
+
     this.nodes.forEach((node) => {
       ctx.lineWidth = 1;
       ctx.setLineDash([5, 5]);
       ctx.strokeStyle = 'lightgrey';
+      ctx.beginPath();
+
       const { x: startX, y: startY } = getCentre(node);
 
       const connectedNodes = this.getConnectedNodes(node).filter(

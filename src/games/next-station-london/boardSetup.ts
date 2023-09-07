@@ -27,3 +27,13 @@ export const START_NODES = [
   { x: 2, y: 5, colour: Colour.Purple },
   { x: 5, y: 7, colour: Colour.Blue },
 ];
+
+export const RIVER = [
+  { x: -1, y: 3 },
+  { x: 2.1, y: 3 },
+  { x: 3.5, y: 4.4 },
+  { x: 3.8, y: 4.95 },
+  { x: 5, y: 4.95 },
+  { x: 6, y: 4 },
+  { x: 10, y: 4 },
+];
