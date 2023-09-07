@@ -1,7 +1,13 @@
 import chalk from 'chalk';
 import { Canvas, createCanvas } from 'canvas';
 
-import { NODES, RIVER, START_NODES, TOURIST_SPOTS } from './boardSetup';
+import {
+  DISTRICT_LINES,
+  NODES,
+  RIVER,
+  START_NODES,
+  TOURIST_SPOTS,
+} from './boardSetup';
 import { Colour, Shape } from './types';
 
 const BOARD_SIZE = 10;
@@ -50,7 +56,7 @@ const getCentre = (node: Node) => {
   return { x, y };
 };
 
-const getRiverPosition = ({ x: gridX, y: gridY }: { x: number; y: number }) => {
+const getLinePosition = ({ x: gridX, y: gridY }: { x: number; y: number }) => {
   const x = (gridX + 0.5) * GRID_SIZE;
   const y = (gridY + 1) * GRID_SIZE;
 
@@ -274,13 +280,28 @@ export class Board {
     ctx.lineWidth = GRID_SIZE / 3;
     ctx.beginPath();
 
-    const { x: startX, y: startY } = getRiverPosition(RIVER[0]);
+    const { x: startX, y: startY } = getLinePosition(RIVER[0]);
     ctx.moveTo(startX, startY);
     RIVER.forEach((position) => {
-      const { x: nextX, y: nextY } = getRiverPosition(position);
+      const { x: nextX, y: nextY } = getLinePosition(position);
       ctx.lineTo(nextX, nextY);
     });
     ctx.stroke();
+
+    ctx.strokeStyle = '#eee600';
+    ctx.lineWidth = 2;
+    DISTRICT_LINES.forEach((line) => {
+      const { x: fromX, y: fromY } = getLinePosition({
+        x: line.fromX,
+        y: line.fromY,
+      });
+      const { x: toX, y: toY } = getLinePosition({ x: line.toX, y: line.toY });
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+    });
 
     this.nodes.forEach((node) => {
       ctx.lineWidth = 1;
