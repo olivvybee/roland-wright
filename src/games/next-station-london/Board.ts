@@ -97,6 +97,17 @@ export class Board {
     );
   };
 
+  getValidPotentialEdges = (
+    node: Node,
+    shape: Shape | undefined,
+    colour: Colour
+  ) => {
+    return this.getConnectedNodes(node)
+      .filter((otherNode) => shape === undefined || otherNode.shape === shape)
+      .map((otherNode) => new Edge(node, otherNode, colour))
+      .filter((edge) => !this.edgeWouldIntersectExistingEdge(edge));
+  };
+
   addEdge = (edge: Edge) => {
     this.edges.push(edge);
   };
