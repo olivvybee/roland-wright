@@ -18,9 +18,11 @@ export const Sagrada: Game = {
 
     const result = bot.play();
     const imageBuffer = renderResult(result);
+    const stringRepresentation = board.toString();
 
     return {
       imageBuffer,
+      stringRepresentation,
       altText:
         "An illustration of completed Sagrada board. It's a grid with 4 rows and 5 columns, filled with randomly chosen dice coloured red, green, blue, yellow, and purple.",
     };

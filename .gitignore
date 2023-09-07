@@ -145,3 +145,5 @@ dist
 
 out.log
 err.log
+
+output.png
