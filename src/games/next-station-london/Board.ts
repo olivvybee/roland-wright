@@ -43,6 +43,13 @@ const colourise = (colour: Colour | undefined) => {
   }
 };
 
+const getCentre = (node: Node) => {
+  const x = (node.x + 0.5) * GRID_SIZE;
+  const y = (node.y + 0.5) * GRID_SIZE;
+
+  return { x, y };
+};
+
 export class Node {
   shape: Shape;
   x: number;
@@ -69,8 +76,7 @@ export class Node {
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
-    const centreX = (this.x + 0.5) * GRID_SIZE;
-    const centreY = (this.y + 0.5) * GRID_SIZE;
+    const { x: centreX, y: centreY } = getCentre(this);
 
     const colour = getHexColour(this.startingSpaceColour);
 
@@ -216,12 +222,66 @@ export class Board {
     });
   }
 
+  getNode = (x: number, y: number) => {
+    return this.nodes.find((node) => node.x === x && node.y === y);
+  };
+
+  getConnectedNodes = (node: Node) => {
+    const connected: Node[] = [];
+
+    for (let yDir = -1; yDir <= 1; yDir++) {
+      for (let xDir = -1; xDir <= 1; xDir++) {
+        let newX = node.x + xDir;
+        let newY = node.y + yDir;
+
+        while (
+          newX >= 0 &&
+          newX < BOARD_SIZE &&
+          newY >= 0 &&
+          newY < BOARD_SIZE
+        ) {
+          const otherNode = this.getNode(newX, newY);
+          if (otherNode) {
+            connected.push(otherNode);
+            break;
+          }
+
+          newX += xDir;
+          newY += yDir;
+        }
+      }
+    }
+
+    return connected;
+  };
+
   draw = () => {
     const canvas = createCanvas(OUTPUT_SIZE, OUTPUT_SIZE);
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+    this.nodes.forEach((node) => {
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = 'lightgrey';
+      const { x: startX, y: startY } = getCentre(node);
+
+      const connectedNodes = this.getConnectedNodes(node).filter(
+        (otherNode) =>
+          otherNode.x > node.x ||
+          (otherNode.x === node.x && otherNode.y > node.y)
+      );
+      connectedNodes.forEach((otherNode) => {
+        const { x: endX, y: endY } = getCentre(otherNode);
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      });
+    });
+
+    ctx.setLineDash([]);
 
     this.nodes.forEach((node) => {
       node.draw(ctx);
@@ -235,7 +295,7 @@ export class Board {
     for (let y = 0; y < BOARD_SIZE; y++) {
       let rowStr = '';
       for (let x = 0; x < BOARD_SIZE; x++) {
-        const node = this.nodes.find((node) => node.x === x && node.y === y);
+        const node = this.getNode(x, y);
         if (node) {
           rowStr += colourise(node.startingSpaceColour)(
             shapeToString(node.shape)
