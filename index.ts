@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs';
+
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { config as loadEnv } from 'dotenv';
@@ -6,13 +9,21 @@ import { GAMES } from './src/games';
 import { Game } from './src/types/Game';
 import { Sagrada } from './src/games/sagrada';
 import { Mastodon } from './src/mastodon';
+import { NextStationLondon } from './src/games/next-station-london';
 
 const schedule: { [hour: number]: Game } = {
   9: Sagrada,
-  21: Sagrada,
+  13: NextStationLondon,
+  17: Sagrada,
+  21: NextStationLondon,
 };
 
-const main = async (gameName?: string) => {
+interface MainArgs {
+  gameName?: string;
+  dryRun?: boolean;
+}
+
+const main = async ({ gameName, dryRun = false }: MainArgs) => {
   const hour = new Date().getHours();
 
   const game = gameName
@@ -30,26 +41,39 @@ const main = async (gameName?: string) => {
 
   const output = game.play();
 
-  const mastodon = new Mastodon(
-    process.env.INSTANCE_URL || '',
-    process.env.ACCESS_TOKEN || ''
-  );
+  if (dryRun) {
+    if (output.stringRepresentation) {
+      console.log(output.stringRepresentation);
+    }
+    const outputFile = path.relative('.', './output.png');
+    fs.writeFileSync(outputFile, output.imageBuffer, 'binary');
+  } else {
+    const mastodon = new Mastodon(
+      process.env.INSTANCE_URL || '',
+      process.env.ACCESS_TOKEN || ''
+    );
 
-  const { id: imageId } = await mastodon.uploadImage(
-    output.imageBuffer,
-    output.altText
-  );
+    const { id: imageId } = await mastodon.uploadImage(
+      output.imageBuffer,
+      output.altText
+    );
 
-  await mastodon.postStatus(game.name, [imageId]);
+    await mastodon.postStatus(game.name, [imageId]);
+  }
 };
 
 const argv = yargs(hideBin(process.argv))
   .option('game', {
     alias: 'g',
     type: 'string',
-    description: 'THe name of the game to run',
+    description: 'The name of the game to run',
+  })
+  .option('dry-run', {
+    alias: 'd',
+    type: 'boolean',
+    description: "Play the game, but don't post to mastodon",
   })
   .parseSync();
 
 loadEnv();
-main(argv.game);
+main({ gameName: argv.game, dryRun: argv.dryRun });
