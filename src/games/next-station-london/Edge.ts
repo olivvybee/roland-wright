@@ -22,8 +22,12 @@ export class Edge {
   };
 
   get intermediatePoints() {
-    const xDir = Math.sign(this.toNode.x - this.fromNode.x);
-    const yDir = Math.sign(this.toNode.y - this.fromNode.y);
+    // Divide xDir and yDir by 2 to account for edges that would intersect between
+    // grid points, by treating the spaces halfway between grid points as points
+    // e.g. an edge from (1, 1) to (2, 2) intersects an edge from (1, 2) to (2, 1)
+    // but they do not cross at a grid point, they cross halfway between
+    const xDir = Math.sign(this.toNode.x - this.fromNode.x) / 2;
+    const yDir = Math.sign(this.toNode.y - this.fromNode.y) / 2;
 
     const points: Array<{ x: number; y: number }> = [];
 
@@ -61,7 +65,7 @@ export class Edge {
     const { x: toX, y: toY } = getCentre(this.toNode);
 
     ctx.strokeStyle = getHexColour(this.colour);
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 10;
     ctx.beginPath();
     ctx.moveTo(fromX, fromY);
     ctx.lineTo(toX, toY);

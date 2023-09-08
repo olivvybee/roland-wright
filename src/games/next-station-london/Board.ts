@@ -97,13 +97,14 @@ export class Board {
     );
   };
 
-  getValidPotentialEdges = (
-    node: Node,
-    shape: Shape | undefined,
-    colour: Colour
-  ) => {
+  getValidPotentialEdges = (node: Node, shape: Shape, colour: Colour) => {
     return this.getConnectedNodes(node)
-      .filter((otherNode) => shape === undefined || otherNode.shape === shape)
+      .filter(
+        (otherNode) =>
+          shape === Shape.Wild ||
+          otherNode.shape === Shape.Wild ||
+          otherNode.shape === shape
+      )
       .map((otherNode) => new Edge(node, otherNode, colour))
       .filter((edge) => !this.edgeWouldIntersectExistingEdge(edge));
   };
