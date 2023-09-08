@@ -1,4 +1,4 @@
-import { Colour, Shape } from './types';
+import { Shape } from './types';
 
 export enum CardColour {
   Blue,
