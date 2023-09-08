@@ -2,7 +2,7 @@ import { Game } from '../../types/Game';
 import { Bot } from './Bot';
 
 export const NextStationLondon: Game = {
-  name: 'next-station-london',
+  name: 'Next Station London',
   play: () => {
     const bot = new Bot();
     bot.play();
