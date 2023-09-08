@@ -16,7 +16,8 @@ export const NextStationLondon: Game = {
 
     return {
       imageBuffer,
-      altText: '',
+      altText:
+        "An abstract map of london with a randomly generated tube network. There are four lines - green, blue, purple, and pink - and they're connecting stations with squares, triangles, circles, and pentagons inside. Each line connects no more than 11 stations. All the unused potential connections between stations are shown as grey dotted lines.",
       stringRepresentation,
     };
   },
