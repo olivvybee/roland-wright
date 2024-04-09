@@ -10,12 +10,14 @@ import { Game } from './src/types/Game';
 import { Sagrada } from './src/games/sagrada';
 import { Mastodon } from './src/mastodon';
 import { NextStationLondon } from './src/games/next-station-london';
+import { RailroadInk } from './src/games/railroad-ink';
 
 const schedule: { [hour: number]: Game } = {
   9: Sagrada,
   13: NextStationLondon,
   17: Sagrada,
   21: NextStationLondon,
+  1: RailroadInk,
 };
 
 interface MainArgs {
