@@ -6,7 +6,7 @@ export const RailroadInk: Game = {
   name: 'Railroad Ink',
   play: () => {
     const board = new Board();
-    console.log(JSON.stringify(board.grid, null, 2));
+    // console.log(JSON.stringify(board.grid, null, 2));
     const bot = new Bot(board);
     bot.play();
 
@@ -15,8 +15,7 @@ export const RailroadInk: Game = {
 
     return {
       imageBuffer,
-      altText:
-        "awawa",
+      altText: 'awawa',
       stringRepresentation,
     };
   },

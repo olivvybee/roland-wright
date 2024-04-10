@@ -1,5 +1,5 @@
 import { Connection, ConnectionMap } from './types';
-
+import { connectionToString } from './utils';
 
 export class Tile {
   providedConnections: ConnectionMap = {
@@ -10,20 +10,34 @@ export class Tile {
   };
   acceptedConnections: ConnectionMap;
 
-
-  constructor(providedConnections: ConnectionMap, acceptedConnections?: ConnectionMap) {
+  constructor(
+    providedConnections: ConnectionMap,
+    acceptedConnections?: ConnectionMap
+  ) {
     this.providedConnections = providedConnections;
     if (acceptedConnections) {
       this.acceptedConnections = acceptedConnections;
     } else {
       this.acceptedConnections = providedConnections;
-    
     }
   }
 
-  /* toString = () => {
-    const str = `${colourString}${valueString}`;
+  toString = () => {
+    const { north, east, south, west } = this.providedConnections;
 
-    return colourise(this.colour)(str);
-  }; */
+    const top = `  ${connectionToString(north)}  `;
+    const middle = `${connectionToString(west)}   ${connectionToString(east)}`;
+    const bottom = `  ${connectionToString(south)}  `;
+
+    return `${top}\n${middle}\n${bottom}`;
+  };
+
+  static emptyTile = () => {
+    return new Tile({
+      north: Connection.None,
+      east: Connection.None,
+      south: Connection.None,
+      west: Connection.None,
+    });
+  };
 }
