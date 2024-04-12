@@ -3,7 +3,7 @@ import { Bot } from './Bot';
 
 export const NextStationLondon: Game = {
   name: 'Next Station London',
-  play: () => {
+  play: async () => {
     const bot = new Bot();
     bot.play();
 

@@ -22,6 +22,11 @@ export class Tile {
     }
   }
 
+  get configuration() {
+    const { north, east, south, west } = this.providedConnections;
+    return [north, east, south, west].map(connectionToString).join('');
+  }
+
   toString = () => {
     const { north, east, south, west } = this.providedConnections;
 

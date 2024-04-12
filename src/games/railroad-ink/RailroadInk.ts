@@ -4,14 +4,14 @@ import { Board } from './Board';
 
 export const RailroadInk: Game = {
   name: 'Railroad Ink',
-  play: () => {
+  play: async () => {
     const board = new Board();
     // console.log(JSON.stringify(board.grid, null, 2));
     const bot = new Bot(board);
     bot.play();
 
     const stringRepresentation = bot.board.toString();
-    const imageBuffer = bot.board.draw();
+    const imageBuffer = await bot.board.draw();
 
     return {
       imageBuffer,

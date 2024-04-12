@@ -1,7 +1,14 @@
-export const BOARD_SIZE = 10;
+import path from 'path';
+
 export const OUTPUT_SIZE = 1000;
-export const GRID_SIZE = OUTPUT_SIZE / BOARD_SIZE;
-export const NODE_SIZE = GRID_SIZE / 2;
-export const SHAPE_SIZE = NODE_SIZE - 25;
-export const ROW_COUNT = 7;
-export const COLUMN_COUNT = 7;
+export const ROW_COLUMN_COUNT = 7;
+export const TILE_SIZE = 128;
+export const BOARD_SIZE = 128 * ROW_COLUMN_COUNT;
+export const BOARD_OFFSET = (OUTPUT_SIZE - BOARD_SIZE) / 2;
+
+export const ASSETS_DIR = path.resolve(
+  'src',
+  'games',
+  'railroad-ink',
+  'assets'
+);

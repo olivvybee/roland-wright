@@ -2,6 +2,7 @@ import { TileDice as TileDice } from "./TileDice";
 import { Board } from "./Board";
 import { Tile } from "./Tile";
 import { Connection } from "./types";
+import { selectRandom } from "../../utils/random";
 
 export class Bot {
     board: Board;
@@ -67,6 +68,16 @@ export class Bot {
           this.board.placeDice(dice, row, column);
         }
       } */
+
+      for (let row = 0; row < 7; row++) {
+        for (let col = 0; col < 7; col++) {
+          const dice = selectRandom(this.dice);
+          const tile = selectRandom(dice);
+          this.board.placeTile(tile, row, col);
+        }
+      }
+
+
   
       return this.board;
     };

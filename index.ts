@@ -41,7 +41,7 @@ const main = async ({ gameName, dryRun = false }: MainArgs) => {
     return;
   }
 
-  const output = game.play();
+  const output = await game.play();
 
   if (dryRun) {
     if (output.stringRepresentation) {

@@ -11,7 +11,7 @@ import { Game } from '../../types/Game.js';
 
 export const Sagrada: Game = {
   name: 'Sagrada',
-  play: () => {
+  play: async () => {
     const pattern = selectRandom(PATTERNS);
     const board = new Board(pattern);
     const bot = new Bot(board);
