@@ -145,24 +145,24 @@ export class Board {
   };
 
   draw = async () => {
+    const images = await this.preloadImages();
+
     const canvas = createCanvas(OUTPUT_SIZE, OUTPUT_SIZE);
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = 'rgb(204, 225, 240)';
     ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-    ctx.strokeStyle = 'black';
     ctx.lineWidth = 4;
+    ctx.strokeStyle = 'black';
     ctx.strokeRect(
       BOARD_OFFSET - 2,
       BOARD_OFFSET - 2,
       BOARD_SIZE + 4,
       BOARD_SIZE + 4
     );
+
     ctx.lineWidth = 1;
-
-    const images = await this.preloadImages();
-
     for (let row = 0; row < this.rowCount; row++) {
       const y = row * TILE_SIZE + BOARD_OFFSET;
 
@@ -170,7 +170,6 @@ export class Board {
       ctx.moveTo(BOARD_OFFSET, y);
       ctx.lineTo(BOARD_OFFSET + BOARD_SIZE, y);
       ctx.stroke();
-
       for (let column = 0; column < this.columnCount; column++) {
         const x = column * TILE_SIZE + BOARD_OFFSET;
 
@@ -178,6 +177,23 @@ export class Board {
         ctx.moveTo(x, BOARD_OFFSET);
         ctx.lineTo(x, BOARD_OFFSET + BOARD_SIZE);
         ctx.stroke();
+      }
+    }
+
+    ctx.strokeStyle = 'rgb(206, 110, 93)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(
+      BOARD_OFFSET + 2 * TILE_SIZE - 1,
+      BOARD_OFFSET + 2 * TILE_SIZE - 1,
+      TILE_SIZE * 3 + 2,
+      TILE_SIZE * 3 + 2
+    );
+
+    for (let row = 0; row < this.rowCount; row++) {
+      const y = row * TILE_SIZE + BOARD_OFFSET;
+
+      for (let column = 0; column < this.columnCount; column++) {
+        const x = column * TILE_SIZE + BOARD_OFFSET;
 
         const tile = this.getGridSpace(row, column) || Tile.emptyTile();
         const tileConfiguration = tile.configuration;
